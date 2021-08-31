@@ -5,6 +5,7 @@ import 'package:real_shop/providers/cart.dart';
 import 'package:real_shop/providers/orders.dart';
 import 'package:real_shop/providers/product.dart';
 import 'package:real_shop/providers/products.dart';
+import 'package:real_shop/screens/auth_screen.dart';
 import 'package:real_shop/screens/cart_screen.dart';
 import 'package:real_shop/screens/edit_product_screen.dart';
 import 'package:real_shop/screens/order_screen.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.deepOrange,
           fontFamily: 'Lato',
         ),
-        home: ProductOverviewScreen(),
+        home: AuthScreeen(),
         routes: {
           ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
           CartScreen.routeName: (_) => CartScreen(),
