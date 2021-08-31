@@ -260,6 +260,7 @@ class _AuthCardState extends State<AuthCard>
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 30),
                   textColor: Theme.of(context).primaryColor,
                 ),
+                //*********************** */
               ],
             ),
           ),
