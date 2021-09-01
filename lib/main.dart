@@ -11,6 +11,7 @@ import 'package:real_shop/screens/edit_product_screen.dart';
 import 'package:real_shop/screens/order_screen.dart';
 import 'package:real_shop/screens/product_detail_screen.dart';
 import 'package:real_shop/screens/product_overview_screen.dart';
+import 'package:real_shop/screens/splash_screen.dart';
 import 'package:real_shop/screens/user_products_screen.dart';
 
 void main() {
@@ -29,22 +30,32 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: Product()),
         ChangeNotifierProvider.value(value: Products()),
       ],
-          child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
+      child: Consumer<Auth>(
+        builder: (ctx, auth, _) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            fontFamily: 'Lato',
+          ),
+          home: auth.isAuth
+              ? ProductOverviewScreen
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, authSnapshot) =>
+                      authSnapshot.connectionState == ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreeen(),
+                ),
+          routes: {
+            ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
+            CartScreen.routeName: (_) => CartScreen(),
+            OrderScreen.routeName: (_) => CartScreen(),
+            EditProductScreen.routeName: (_) => EditProductScreen(),
+            UserProductScreen.routeName: (_) => UserProductScreen(),
+          },
         ),
-        home: AuthScreeen(),
-        routes: {
-          ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
-          CartScreen.routeName: (_) => CartScreen(),
-          OrderScreen.routeName: (_) => CartScreen(),
-          EditProductScreen.routeName: (_) => EditProductScreen(),
-          UserProductScreen.routeName: (_) => UserProductScreen(),
-        },
       ),
     );
   }

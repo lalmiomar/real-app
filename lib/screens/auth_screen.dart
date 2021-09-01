@@ -1,8 +1,10 @@
-import 'dart:html';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:real_shop/models/http_exception.dart';
+import 'package:real_shop/providers/auth.dart';
 
 class AuthScreeen extends StatelessWidget {
   static const routName = '/auth';
@@ -18,7 +20,7 @@ class AuthScreeen extends StatelessWidget {
                 gradient: LinearGradient(
               colors: [
                 Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
-                Color.fromRGBO(255, 188, 117, 1).withOpacity(0.5),
+                Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -130,34 +132,74 @@ class _AuthCardState extends State<AuthCard>
     _controller.dispose();
   }
 
-  Future<void> _submit() async{
-    if(!_fromKey.currentState.validate()){
+  Future<void> _submit() async {
+    if (!_fromKey.currentState.validate()) {
       return;
     }
+
+    FocusScope.of(context).unfocus();
+    _fromKey.currentState.save();
 
     setState(() {
       _isLoading = true;
     });
 
-    try{
-
-    }catch(error){
-
+    try {
+      if (_authMode == AuthMode.Login) {
+        Provider.of<Auth>(context, listen: false)
+            .login(_authData['email'], _authData['password']);
+      } else {
+        Provider.of<Auth>(context, listen: false)
+            .signUp(_authData['email'], _authData['password']);
+      }
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed.';
+      if (error.toString() == 'EMAIL_EXISTS') {
+        errorMessage = 'This email address is already in use.';
+      } else if (error.toString() == 'INVALID_EMAIL') {
+        errorMessage = 'This is not a valid email address.';
+      } else if (error.toString() == 'WEAK_PASSWORD') {
+        errorMessage = 'This password is to weak.';
+      } else if (error.toString() == 'EMAIL_NOT_FOUND') {
+        errorMessage = 'Could not find a user with that email.';
+      } else if (error.toString() == 'INVALID_PASSWORD') {
+        errorMessage = 'Invalid password.';
+      }
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+      _showErrorDialog(errorMessage);
     }
 
-     setState(() {
+    setState(() {
       _isLoading = false;
     });
   }
 
-  void _switchAouthMode(){
-    if(_authMode == AuthMode.Login){
+  void _showErrorDialog(String message) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text('An Error Occurred!'),
+              content: Text(message),
+              actions: [
+                FlatButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text('Okey!'),
+                ),
+              ],
+            ));
+  }
+
+  void _switchAuthMode() {
+    if (_authMode == AuthMode.Login) {
       setState(() {
         _authMode = AuthMode.SignUp;
       });
       _controller.forward();
-    }else{
-        setState(() {
+    } else {
+      setState(() {
         _authMode = AuthMode.Login;
       });
       _controller.reverse();
@@ -179,7 +221,7 @@ class _AuthCardState extends State<AuthCard>
         constraints: BoxConstraints(
           minHeight: _authMode == AuthMode.SignUp ? 320 : 260,
         ),
-        width: deviceSize.width * .075,
+        width: deviceSize.width * 0.75,
         padding: EdgeInsets.all(16),
         child: Form(
           key: _fromKey,
@@ -229,7 +271,6 @@ class _AuthCardState extends State<AuthCard>
                         decoration:
                             InputDecoration(labelText: "Confirm Password"),
                         obscureText: true,
-                        controller: _passwordController,
                         validator: _authMode == AuthMode.SignUp
                             ? (val) {
                                 if (val != _passwordController.text) {
@@ -249,18 +290,17 @@ class _AuthCardState extends State<AuthCard>
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-                  color:  Theme.of(context).primaryColor,
+                  color: Theme.of(context).primaryColor,
                   textColor: Theme.of(context).accentTextTheme.headline6.color,
                 ),
                 FlatButton(
                   child: Text(
                     '${_authMode == AuthMode.Login ? 'SIGNUP' : 'LOGIN'} INSTED',
                   ),
-                  onPressed: _switchAouthMode,
+                  onPressed: _switchAuthMode,
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 30),
                   textColor: Theme.of(context).primaryColor,
                 ),
-                //*********************** */
               ],
             ),
           ),
