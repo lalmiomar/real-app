@@ -29,7 +29,7 @@ class Product with ChangeNotifier {
     isFavorite = !isFavorite;
     notifyListeners();
 
-    final url = '';
+    final url ='https://shop-347d2-default-rtdb.firebaseio.com/userFavorites.json/$userId/$id.json?auth=$token';
     try {
       final res = await http.put(url, body: json.encode(isFavorite));
       if(res.statusCode >= 400){
