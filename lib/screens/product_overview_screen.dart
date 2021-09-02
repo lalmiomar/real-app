@@ -29,7 +29,9 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
         .then(
           (_) => setState(() => _isLoading = true),
         )
-        .catchError((error) => print(error));
+        .catchError((error) => setState(
+              () => _isLoading = false,
+            ));
   }
 
   @override

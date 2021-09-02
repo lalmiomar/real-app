@@ -79,7 +79,7 @@ class Products with ChangeNotifier {
       final favRes = await http.get(url);
       final favData = json.decode(favRes.body);
       final List<Product> loadedProducts = [];
-      extractedData.forEach((prodId, prodData) {
+     extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
           id: prodId,
           title: prodData['title'],
@@ -152,7 +152,7 @@ class Products with ChangeNotifier {
     notifyListeners();
 
     final res = await http.delete(url);
-    if(res.statusCode >= 4000){
+    if (res.statusCode >= 4000) {
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
       throw HttpException('Could not delete Product.');
